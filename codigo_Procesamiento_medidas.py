@@ -67,7 +67,14 @@ base_de_datos.cargar_usuarios(archivo_usuarios = os.path.join(path_guardado, # L
                               )
 
 import pandas as pd
+def filter_with_strings(raul, strings):
+    raul = raul.loc[~(raul['tw_text'].str.contains(strings, case=False)) &
+                    ~(raul['or_text'].str.contains(strings, case=False)), :]
+    return raul
+
+
 def filtrar_datos(datos):
+        
     # 1) Filtramos los tweets y nos quedamos con aquellos que no tienen tw_location o que 
     # su tw_location incluye argentina
     datos['tw_location'] = datos['tw_location'].fillna('').apply(lambda x: x.strip())
@@ -77,29 +84,56 @@ def filtrar_datos(datos):
     
     datos['tw_text'] = datos['tw_text'].fillna('')
     datos['or_text'] = datos['or_text'].fillna('')
-    # 2) Podriamos filtrar por la aparición de Yuri en tw_text
-    datos = datos.loc[~(datos['tw_text'].str.contains('Yuri|YURI|yuri')) &
-                      ~(datos['or_text'].str.contains('Yuri|YURI|yuri')), :]  
-    
+    # 2) Podriamos filtrar por la aparición de Yuri/Yuti en tw_text y en or_text
+    datos = filter_with_strings(datos, 'yuri|yuti')
+
     # 3) ídem pero con Fujimori|FUJIMORI|fujimori
-    datos = datos.loc[~(datos['tw_text'].str.contains('Fujimori|FUJIMORI|fujimori')) &
-                      ~(datos['or_text'].str.contains('Fujimori|FUJIMORI|fujimori')), :]  
+    datos = filter_with_strings(datos, 'fujimori')
+
+    # 4) Bárcena
+    datos = filter_with_strings(datos, 'bárcena|barcena')
+
+    # 5) Carlos Alberto Maya
+    datos = filter_with_strings(datos, 'maya')
+
+    # 6) Alberto Chang
+    datos = filter_with_strings(datos, 'chang')
+
+    # 7) @OmarPrietoGob 
+    datos = filter_with_strings(datos, '@OmarPrietoGob')
+    
+    # 8) Mujica
+    datos = filter_with_strings(datos, 'mujica')
+
+    # 9) Alberto Carasquilla
+    datos = filter_with_strings(datos, 'carasquilla')
+
+    # 10) Alberto Tejada 
+    datos = filter_with_strings(datos, 'tejada')
+    
+    # 11) Nicolas Maduro 
+    datos = filter_with_strings(datos, 'nicolas maduro|nicolás maduro')
+
+    # 12) Alberto Valero
+    datos = filter_with_strings(datos, 'valero')
+
+    # 13) Guastatoya
+    datos = filter_with_strings(datos, 'guastatoya')
+
+    # 14) @pelaez_alberto
+    datos = filter_with_strings(datos, '@pelaez_alberto')
+
+    # 15) barroco
+    datos = filter_with_strings(datos, 'barroco')
+
+    # 16) Limache
+    datos = filter_with_strings(datos, 'limache')
 
     return datos
     
     
 base_de_datos.tweets = filtrar_datos(base_de_datos.tweets)
-
-import json
-import simplejson
-sample = base_de_datos.tweets.sample(10)
-for index, row in sample.iterrows():
-    d = dict(row)
-    del d['tw_created_at']
-    del d['or_created_at']
-    print(simplejson.dumps(d, ignore_nan=True))
-    # print(json.dumps(d))
-    # print(dict(row))
+base_de_datos.tweets.shape
 
 
 # print(base_de_datos.usuarios)
@@ -112,9 +146,9 @@ base_de_datos.plot_tipo_tweet()
 # Analicemso cómo se distribuyen los usuarios según su rol
 base_de_datos.plot_rol_usuario()
 # Nube de palabras
-base_de_datos.plot_nube(fecha_inicial='2021-05-12', fecha_final='2021-05-13')
+base_de_datos.plot_nube() #fecha_inicial='2021-05-12', fecha_final='2021-05-13')
 # Principales Hashtags
-base_de_datos.plot_principales_Hashtags(fecha_inicial='2021-05-12', fecha_final='2021-05-13')
+base_de_datos.plot_principales_Hashtags() #fecha_inicial='2021-05-12', fecha_final='2021-05-13')
 # Principales Usuarios
 base_de_datos.plot_principales_Usuarios(metrica_interes = 'or_favCount',fecha_inicial='2021-05-12', fecha_final='2021-05-13')
 # Análisis temporal
